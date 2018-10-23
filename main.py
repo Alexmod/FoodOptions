@@ -8,6 +8,7 @@ from kivy.core.window import Window
 from kivy.config import ConfigParser
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
+from kivy.metrics import dp
 from datetime import datetime
 import os
 import ast
@@ -35,7 +36,7 @@ class SortedListFood(Screen):
         self.layout.bind(minimum_height=self.layout.setter('height'))
         back_button = Button(text='< Назад в главное меню',
                              on_press=lambda x: set_screen('menu'),
-                             size_hint_y=None, height=40)
+                             size_hint_y=None, height=dp(40))
         self.layout.add_widget(back_button)
         root = RecycleView(size_hint=(1, None), size=(Window.width,
                                                       Window.height))
@@ -46,8 +47,8 @@ class SortedListFood(Screen):
             App.get_running_app().config.get('General', 'user_data'))
 
         for f, d in sorted(dic_foods.items(), key=lambda x: x[1]):
-            fd = f + ' ' + (datetime.fromtimestamp(d).strftime('%Y-%m-%d'))
-            btn = Button(text=fd, size_hint_y=None, height=40)
+            fd = f.decode('u8') + ' ' + (datetime.fromtimestamp(d).strftime('%Y-%m-%d'))
+            btn = Button(text=fd, size_hint_y=None, height=dp(40))
             self.layout.add_widget(btn)
 
     def on_leave(self):  # Будет вызвана, в момент закрытия экрана
@@ -63,7 +64,7 @@ class AddFood(Screen):
         self.app = App.get_running_app()
         self.app.user_data = ast.literal_eval(
             self.app.config.get('General', 'user_data'))
-        self.app.user_data[self.txt1.text] = int(time.time())
+        self.app.user_data[self.txt1.text.encode('u8')] = int(time.time())
 
         self.app.config.set('General', 'user_data', self.app.user_data)
         self.app.config.write()
@@ -76,12 +77,12 @@ class AddFood(Screen):
         super(AddFood, self).__init__(**kw)
         box = BoxLayout(orientation='vertical')
         back_button = Button(text='< Назад в главное меню', on_press=lambda x:
-                             set_screen('menu'), size_hint_y=None, height=40)
+                             set_screen('menu'), size_hint_y=None, height=dp(40))
         box.add_widget(back_button)
-        self.txt1 = TextInput(text='', multiline=False, height=40,
+        self.txt1 = TextInput(text='', multiline=False, height=dp(40),
                               size_hint_y=None, hint_text="Название блюда")
         box.add_widget(self.txt1)
-        btn1 = Button(text="Добавить блюдо", size_hint_y=None, height=40)
+        btn1 = Button(text="Добавить блюдо", size_hint_y=None, height=dp(40))
         btn1.bind(on_press=self.buttonClicked)
         box.add_widget(btn1)
         self.result = Label(text='')
